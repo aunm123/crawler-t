@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "crawler": "^1.1.2"
+    "crawler": "^1.1.2",
+    "querystring": "^0.2.0"
   }
 }
