@@ -10,15 +10,19 @@ function urlPar(url, res) {
 }
 
 // 不爬取无关的页面
-function fitUrl(url) {
-	// let video_patt = /\/video\d+/g;
-	//
-	// if (video_patt.test(url)) {
-	// 	return true;
-	// }
-	// return false;
-	
-	return true;
+function fitUrl(url , length) {
+
+	if (length >= 3){
+		let video_patt = /\/video\d+/g;
+
+		if (video_patt.test(url)) {
+			return true;
+		}
+		return false;
+	}else {
+		return true;
+	}
+
 }
 
 
@@ -47,6 +51,7 @@ function VideoPlayFunction(url,res) {
 			category_id : 1,
 			icon : videoimage,
 			name : videoTitle,
+			createtime: new Date(),
 		};
 		
 		// console.log(video);
@@ -56,14 +61,6 @@ function VideoPlayFunction(url,res) {
 	}catch (e) {
 		console.log("爬取了错误页面",url);
 	}
-}
-
-function XiaosuoFunction(url,res) {
-
-}
-
-function PictureFunction(url,res) {
-
 }
 
 module.exports ={

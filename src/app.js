@@ -1,21 +1,26 @@
 const dbUtil = require('./db/dbUtil');
-const {urlPar, fitUrl} = require('./parse/xvideoParase');
+const {urlPar, fitUrl} = require('./parse/avldzParase');
+const config = require('./global');
+
+let startUrl = 'http://avldz.com/vod-detail-id-95765.html';
+
+config.host = startUrl.match(/(https?:\/\/\S[^/]*)/)[1];
 
 dbUtil.init();
 
 var Crawler = require("crawler");
 
-var host = "https://www.xvideos.com";
+var host = config.host;
 
 var hasReadSet = new Set();
 var ResultUrl = new Object();
 
-dbUtil.findAllCache(1, (result)=>{
-	if (result!==false) {
-		result.forEach((item)=>{
+dbUtil.findAllCache(1, (result) => {
+	if (result !== false) {
+		result.forEach((item) => {
 			hasReadSet.add(item.url);
 		});
-		
+
 		startCrawler();
 	}
 });
@@ -27,68 +32,71 @@ var c = new Crawler({
 		if (error) {
 			console.log(error);
 		} else {
-			
+
 			// 还没爬取过
 			// 本次爬取去重
 			if (hasReadSet.has(this.uri)) {
 			} else {
 				// 还没爬取过
-				dbUtil.setUrlCacheHasRead(this.uri);
+				if (this.uri!==startUrl){
+					dbUtil.setUrlCacheHasRead(this.uri);
+				}
 				console.log("获得返回", this.uri);
 				hasReadSet.add(this.uri);
-				
+
 				try {
 					urlPar(this.uri, res);
-				} catch (e){
+				} catch (e) {
 					console.log('分析失败')
 				}
-				
+
 				//深度爬取得
-				deepCrawler(5, res , this.uri);
-				
+				// deepCrawler(5, res, this.uri);
+
 			}
 			done();
-			
-			
+
+
 		}
 	}
 });
 
 
-function deepCrawler(deep, res ,uri) {
-	
+function deepCrawler(deep, res, uri) {
+
 	let parentParam = res.options.parent;
-	
+
 	let urlSet = new Set();
 	let $ = res.$;
-	
+
 	// $ 默认为 Cheerio 解析器
 	$("a").each((index, item) => {
 		let tempurl = item.attribs['href'];
 		if (tempurl !== null && tempurl !== undefined && tempurl.indexOf('/') === 0) {
 			let tUrl = host + tempurl;
-			
+
 			if (tUrl !== uri) {
 				urlSet.add(tUrl);
-				
+
 				let parrUrl = host + tempurl;
-				if (passUrl(parrUrl) && fitUrl(parrUrl)) {
-					let newp = [...parentParam, parrUrl];
-					//深度为
+				let newp = [...parentParam, parrUrl];
+				if (passUrl(parrUrl) && fitUrl(parrUrl, newp.length)) {
+
+					//深度
 					if (newp.length < deep) {
 						dbUtil.insertCache(parrUrl, JSON.stringify(newp));
 						c.queue({
 							uri: parrUrl,
 							parent: newp,
 						});
-						
+
 					}
 				}
 			}
-			
+
 		}
 	});
-	
+
 	let re = ResultUrl;
 	for (let i = 0; i < parentParam.length; i++) {
 		let par = parentParam[i];
@@ -97,7 +105,7 @@ function deepCrawler(deep, res ,uri) {
 		}
 		re = re[par];
 	}
-	
+
 	let tempArr = Array.from(urlSet);
 	tempArr.forEach(function (item) {
 		re[item] = new Object();
@@ -106,7 +114,7 @@ function deepCrawler(deep, res ,uri) {
 
 function passUrl(url) {
 	let video_patt = /\.xml|\.js|\.css|\.mp4/
-	
+
 	if (video_patt.test(url)) {
 		return false;
 	}
@@ -119,12 +127,14 @@ c.userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.3
 
 
 function startCrawler() {
-	
+
+
+
 	// 找出之前已经爬取但还没读取的Html
-	// 他们的父级变成2级别
-	dbUtil.findAllCache(0, (result)=>{
-		if (result!==false) {
-			result.forEach((item)=>{
+	// 设置他们的父级
+	dbUtil.findAllCache(0, (result) => {
+		if (result !== false) {
+			result.forEach((item) => {
 				c.queue({
 					uri: item.url,
 					parent: JSON.parse(item.level),
@@ -132,19 +142,19 @@ function startCrawler() {
 			});
 		}
 	});
-	
-	
+
+
 	c.queue({
 		headers: {
 			// Content-Type:text/html;;charset=UTF-8
 		},
-		uri: 'https://www.xvideos.com/',
-		parent: ['https://www.xvideos.com/'],
+		uri: startUrl,
+		parent: [startUrl],
 	});
 
 //每秒检测一次，队列是否为空
 	setInterval(function () {
-		if (c.queueSize === 0) {
+		if (c.queueSize === 0 && config.chirldLoading <= 0) {
 			console.log('爬取已结束');
 			// console.log(hasReadSet);
 			process.exit();
