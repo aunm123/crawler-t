@@ -3,15 +3,20 @@ const dbUtil = require('../db/dbUtil');
 
 dbUtil.init();
 
-let startUrl = 'http://avldz.com/art-type-id-7-pg-1.html';
+let startUrl = 'http://avldz.com/art-type-id-9-pg-1.html';
 let host = startUrl.match(/(https?:\/\/\S[^/]*)/)[1];
 let currentCategoryid = 0;
 
-var Crawler = require("crawler");
-
 function startFF() {
-
-	cFirst.queue({uri: startUrl,timeout: 150000})
+	
+	for (let i = 19; i<=24; i++){
+		let temp = startUrl.replace(/-id-(\d*)/,"-id-"+i);
+		// console.log(temp);
+		cFirst.queue({
+			uri: temp,
+			timeout: 150000,
+		})
+	}
 
 }
 
@@ -25,28 +30,39 @@ var cFirst = new Crawler({
 		if (error) {
 			console.log(error);
 		} else {
-			let $ = res.$;
-			let lastUrl = $('body > div:nth-child(9) > div.wrap.mt10 > div.pagination > a:nth-child(9)').attr('href');
-			let maxPage = lastUrl.match(/-pg-(\d*)/)[1];
-
-			let	id = res.options.uri.match(/type-id-(\d*)-/)[1];
-			let	name = $('head > meta:nth-child(3)').attr('content');
-			name = name.match(/(\S*)第/)[1];
-
-			currentCategoryid = id;
-
-			let category = {
-				id: id,
-				name: name,
-				des: name,
-			}
-
-			dbUtil.insertCategory(category);
-
-			let urldemo = host + lastUrl;
-			for(let i = maxPage ; i>0 ; i--){
-				let temp = urldemo.replace(/-pg-(\d*)/,"-pg-"+i);
-				cList.queue({uri: temp});
+			try {
+				let $ = res.$;
+				
+				let ll = $('.pagination .pagebtn').attr('onclick').match(/,(\d*)/)[1];
+				let ll2 = $('.pagination .pagelink_a').attr('href');
+				
+				let lastUrl = ll2.replace(/-pg-(\d*)/,"-pg-"+ll);
+				let maxPage = lastUrl.match(/-pg-(\d*)/)[1];
+				
+				let	id = res.options.uri.match(/type-id-(\d*)-/)[1];
+				let	name = $('head > meta:nth-child(3)').attr('content');
+				name = name.match(/(\S*)第/)[1];
+				
+				currentCategoryid = id;
+				
+				let category = {
+					id: id,
+					name: name,
+					des: name,
+				}
+				
+				dbUtil.insertCategory(category);
+				
+				let urldemo = host + lastUrl;
+				for(let i = maxPage ; i>0 ; i--){
+					let temp = urldemo.replace(/-pg-(\d*)/,"-pg-"+i);
+					cList.queue({
+						uri: temp,
+						timeout: 150000,
+					});
+				}
+			}catch (e){
+				// console.log(e)
 			}
 
 		}
@@ -67,7 +83,10 @@ var cList = new Crawler({
 			targetUl.each(function (index, item) {
 				let url = host + item.attribs.href;
 
-				cDetail.queue({uri: url});
+				cDetail.queue({
+					uri: url,
+					timeout: 150000,
+				});
 			})
 		}
 		done();
@@ -89,7 +108,7 @@ var cDetail = new Crawler({
 			let icon = $('.content .movievod img:nth-child(2)').attr('src');
 			let id = res.options.uri.match(/-id-(\d*)-/)[1];
 
-			if (detail_content == null || detail_content === undefined){
+			if (detail_content === null || detail_content === undefined){
 
 			}else {
 				let article = {

@@ -48,7 +48,7 @@ exports.findArticleById = function (aid, callback = defaultCallback) {
 				callback(true);
 			}
 			else {
-				callback({});
+				callback(false);
 			}
 		}
 	});
@@ -70,7 +70,8 @@ exports.insertArticle = function (article, callback = defaultCallback) {
 		if (result === false) {
 			query(sql, function (err, result, fields) {
 				if (err) {
-					callback({});
+					console.log(err);
+					callback(err);
 				}
 				else {
 					callback(true);
