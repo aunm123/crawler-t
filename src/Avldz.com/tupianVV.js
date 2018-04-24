@@ -37,7 +37,7 @@ function startFF() {
 var cFirst = new Crawler({
 	skipDuplicates: true,
 	maxConnections: 1,
-	rateLimit: 1000,
+	rateLimit: 2000,
 	callback: function (error, res, done) {
 		if (error) {
 			console.log(error);
@@ -93,7 +93,7 @@ var cFirst = new Crawler({
 var cList = new Crawler({
 	skipDuplicates: true,
 	maxConnections: 1,
-	rateLimit: 1000,
+	rateLimit: 5000,
 	callback: function (error, res, done) {
 		if (error) {
 			console.log(error);
@@ -201,13 +201,13 @@ var cvideo = new Crawler({
 });
 
 
-// startFF();
+startFF();
 
-cFirst.queue({
-	uri: startUrl,
-	timeout: 1000,
-	retries: 100,
-})
+// cFirst.queue({
+// 	uri: startUrl,
+// 	timeout: 1000,
+// 	retries: 100,
+// })
 
 // 每秒检测一次，队列是否为空
 setInterval(function () {
