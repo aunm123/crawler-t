@@ -9,7 +9,7 @@ let currentCategoryid = 0;
 
 function startFF() {
 	
-	for (let i = 19; i<=24; i++){
+	for (let i = 16; i<=17; i++){
 		let temp = startUrl.replace(/-id-(\d*)/,"-id-"+i);
 		// console.log(temp);
 		cFirst.queue({

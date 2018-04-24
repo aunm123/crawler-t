@@ -137,7 +137,7 @@ exports.findVideoById = function (vid, callback = defaultCallback) {
 		return;
 	}
 
-	let addSql = 'select * from `article`.`t_video` where `id` = ?';
+	let addSql = 'select * from `t_video` where `id` = ?';
 	let addParams = [vid];
 	let sql = mysql.format(addSql, addParams);
 
@@ -164,7 +164,7 @@ exports.insertVideo = function (video, callback = defaultCallback) {
 		return;
 	}
 
-	let addSql = 'insert into `article`.`t_video` ( `id`, `url`, `category_id`, `icon`, `name`, `createtime`) values' +
+	let addSql = 'insert into `t_video` ( `id`, `url`, `category_id`, `icon`, `name`, `createtime`) values' +
 		' ( ?, ?, ?, ?, ?, ?);';
 	let addParams = [video.id, video.url, video.category_id, video.icon, video.name, video.createtime];
 	let sql = mysql.format(addSql, addParams);
@@ -269,7 +269,7 @@ exports.setUrlCacheHasRead = function (url, callback = defaultCallback) {
 		callback(false);
 		return;
 	}
-	let addSql = 'update `article`.`cache` set `read`=b\'1\' where `url`= ?;';
+	let addSql = 'update `cache` set `read`=b\'1\' where `url`= ?;';
 	let addParams = [url];
 	let sql = mysql.format(addSql, addParams);
 
