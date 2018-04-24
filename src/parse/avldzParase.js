@@ -30,9 +30,9 @@ function VideoPlayFunction(url, res) {
 	console.log("正在爬取", url);
 
 	let $ = res.$;
-	let imagep = $('#main > div > div.film_info.clearfix > div > dl > dt > img').attr('src');
+	let imagep = $('.movie_info dl dt img').attr('src');
 
-	let playDetail = config.host + $('#mp4play > div.play-list > a:nth-child(1)').attr('href');
+	let playDetail = config.host + $('.play-list a:nth-child(1)').attr('href');
 
 	config.chirldLoading += 1;
 	cvideo.queue({
@@ -69,10 +69,12 @@ var cvideo = new Crawler({
 				createtime: new Date(),
 			};
 
-			dbUtil.insertVideo(video, (finish) => {
-				config.chirldLoading = config.chirldLoading - 1;
-				if (finish) console.log("插入成功")
-			});
+			console.log(video);
+
+			// dbUtil.insertVideo(video, (finish) => {
+			// 	config.chirldLoading = config.chirldLoading - 1;
+			// 	if (finish) console.log("插入成功")
+			// });
 
 		}
 		done();

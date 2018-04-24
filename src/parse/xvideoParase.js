@@ -54,10 +54,10 @@ function VideoPlayFunction(url,res) {
 			createtime: new Date(),
 		};
 		
-		// console.log(video);
-		dbUtil.insertVideo(video, (finish)=>{
-			if (finish) console.log("插入成功")
-		})
+		console.log(video);
+		// dbUtil.insertVideo(video, (finish)=>{
+		// 	if (finish) console.log("插入成功")
+		// })
 	}catch (e) {
 		console.log("爬取了错误页面",url);
 	}
@@ -66,4 +66,5 @@ function VideoPlayFunction(url,res) {
 module.exports ={
 	urlPar,
 	fitUrl,
+	VideoPlayFunction
 };

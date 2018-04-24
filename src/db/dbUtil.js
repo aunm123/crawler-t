@@ -143,7 +143,7 @@ exports.findVideoById = function (vid, callback = defaultCallback) {
 
 	query(sql, function (err, rows, fields) {
 		if (err) {
-			callback(false);
+			callback({});
 		}
 		else {
 			if (rows.length > 0) {

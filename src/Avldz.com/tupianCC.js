@@ -125,9 +125,6 @@ var cDetail = new Crawler({
 					if (finish !== false) console.log("文章插入成功")
 				})
 			}
-
-
-
 		}
 		done();
 	}
