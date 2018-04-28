@@ -31,14 +31,14 @@ exports.init = function () {
 	});
 };
 
-exports.findArticleById = function (aid, callback = defaultCallback) {
+exports.findArticleByTag = function (tag, callback = defaultCallback) {
 
-	if (aid === null) {
-		callback(false);
+	if (tag === null) {
+		callback({});
 		return;
 	}
 
-	var sql = 'SELECT * FROM t_article WHERE id = "' + aid + '"';
+	var sql = 'SELECT * FROM t_article WHERE tag = "' + tag + '"';
 	query(sql, function (err, rows, fields) {
 		if (err) {
 			callback({});
@@ -61,12 +61,12 @@ exports.insertArticle = function (article, callback = defaultCallback) {
 		return;
 	}
 
-	let addSql = 'insert into `t_article` ( `id`, `content`, `category_id`, `create_time`, `name`, `des`, `icon`) ' +
+	let addSql = 'insert into `t_article` ( `content`, `category_id`, `create_time`, `name`, `des`, `icon`, `tag`) ' +
 		'values (?,?,?,?,?,?,?);';
-	let addParams = [article.id, article.content, article.category_id, article.create_time, article.name, article.des,article.icon];
+	let addParams = [article.content, article.category_id, article.create_time, article.name, article.des,article.icon,article.tag];
 	let sql = mysql.format(addSql, addParams);
 
-	this.findArticleById(article.id, (result) => {
+	this.findArticleByTag(article.tag, (result) => {
 		if (result === false) {
 			query(sql, function (err, result, fields) {
 				if (err) {
