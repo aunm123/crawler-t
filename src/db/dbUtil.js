@@ -164,9 +164,9 @@ exports.insertVideo = function (video, callback = defaultCallback) {
 		return;
 	}
 
-	let addSql = 'insert into `t_video` ( `id`, `url`, `category_id`, `icon`, `name`, `createtime`) values' +
+	let addSql = 'insert into `t_video` ( `id`, `url`, `mcategory_id`, `icon`, `name`, `createtime`) values' +
 		' ( ?, ?, ?, ?, ?, ?);';
-	let addParams = [video.id, video.url, video.category_id, video.icon, video.name, video.createtime];
+	let addParams = [video.id, video.url, video.mcategory_id, video.icon, video.name, video.createtime];
 	let sql = mysql.format(addSql, addParams);
 
 	this.findVideoById(video.id, (result) => {

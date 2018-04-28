@@ -20,13 +20,11 @@ function startFF() {
 	for (let i = 56; i<=64; i++){
 		let temp = startUrl.replace(/-id-(\d*)/,"-id-"+i);
 		// console.log(temp);
-		 if(not(url)){
-			 cFirst.queue({
-				 uri: temp,
-				 timeout: 1000,
-				 retries: 100,
-			 })
-		 }
+		cFirst.queue({
+			uri: temp,
+			timeout: 1000,
+			retries: 100,
+		})
 	}
 
 }
@@ -153,7 +151,7 @@ var cDetail = new Crawler({
 var cvideo = new Crawler({
 	skipDuplicates: true,
 	maxConnections: 1,
-	rateLimit: 5000,
+	rateLimit: 1000,
 	callback: function (error, res, done) {
 		if (error) {
 			console.log(error);
@@ -167,7 +165,9 @@ var cvideo = new Crawler({
 
 				let videourl = videoMessage.match(/mac_url=unescape\('(\S[^']*)'/)[1];    		//截取url
 				videourl = unescape(videourl);
-				videourl = videourl.match(/\S*\$(\S*)/)[1];
+				try {
+					videourl = videourl.match(/\S*\$(\S*)/)[1];
+				}catch (e){}
 
 				let videoid = videoMessage.match(/\/vod-play-id-(\d*)-/)[1];
 
@@ -177,7 +177,7 @@ var cvideo = new Crawler({
 				let video = {
 					id: parseInt(videoid),
 					url: videourl,
-					category_id: parseInt(video_cid),
+					mcategory_id: parseInt(video_cid),
 					icon: res.options.videoImageUrl,
 					name: videoTitle,
 					createtime: new Date(),
