@@ -5,7 +5,6 @@ dbUtil.init();
 
 let startUrl = 'http://www.173qr.com/html/photo/1/1.html';
 let host = startUrl.match(/(https?:\/\/\S[^/]*)/)[1];
-let currentCategoryid = 0;
 
 function startFF() {
 	
@@ -38,8 +37,6 @@ var cFirst = new Crawler({
 				let	id = res.options.catid;
 				let	name = $('.nle h3').text();
 				
-				currentCategoryid = id;
-				
 				let category = {
 					id: id,
 					name: name,
@@ -47,15 +44,20 @@ var cFirst = new Crawler({
 				}
 				// console.log(category);
 				
-				dbUtil.insertCategory(category);
-
+				// dbUtil.insertCategory(category);
+				
+				let maxPage = $('.pagination a:last').href;
+				maxPage = maxPage.match(/\/(\d*).html/)[1];
 				let urldemo = res.options.uri;
 				for(let i = maxPage ; i>0 ; i--){
-					let temp = urldemo.replace(/-pg-(\d*)/,"-pg-"+i);
-					cList.queue({
-						uri: temp,
-						timeout: 150000,
-					});
+					let temp = urldemo.replace(/\/(\d*).html/,"\/"+i+".html");
+					
+					console.log(temp);
+					
+					// cList.queue({
+					// 	uri: temp,
+					// 	timeout: 150000,
+					// });
 				}
 				
 			}catch (e){
