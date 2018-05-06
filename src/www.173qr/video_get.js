@@ -1,15 +1,16 @@
 var Crawler = require("crawler");
 const dbUtil = require('../db/dbUtil');
+const ImgDoenload = require('../util/ImgDoenload');
 
 dbUtil.init();
 
-let startUrl = 'http://www.173qr.com/html/photo/1/1.html';
+let startUrl = 'http://www.173qr.com/html/video/1/1.html';
 let host = startUrl.match(/(https?:\/\/\S[^/]*)/)[1];
 
 function startFF() {
 
 	for (let i = 1; i <= 8; i++) {
-		let temp = startUrl.replace(/photo\/(\d*)/, "photo/" + i);
+		let temp = startUrl.replace(/video\/(\d*)/, "video/" + i);
 		// console.log(temp);
 		cFirst.queue({
 			uri: temp,
@@ -80,15 +81,13 @@ var cList = new Crawler({
 			console.log(error);
 		} else {
 			let $ = res.$;
-			let targetUl = $('.plist ul li a');
+			let targetUl = $('.nbox ul li a');
 			targetUl.each(function (index, item) {
 				let url = host + item.attribs.href;
 
-				let tag = 'qr' + url.match(/\/(\d*).html/)[1];
-				// console.log(url);
+				let tag = 'qrv' + url.match(/\/(\d*).html/)[1];
 
-
-				dbUtil.findArticleByTag(tag,(finish)=>{
+				dbUtil.findVideoByTag(tag,(finish)=>{
 					if (finish === false){
 						cDetail.queue({
 							uri: url,
@@ -114,31 +113,62 @@ var cDetail = new Crawler({
 			console.log(error);
 		} else {
 			let $ = res.$;
-			let detail_content = $('.txt .tcont').html();
-			let name = $('.txt .thead').text();
-			let icon = $('.txt .tcont img:nth-child(2)').attr('src');
-			let id = res.options.uri.match(/\/(\d*).html/)[1];
-
-			if (detail_content === null || detail_content === undefined) {
-
-			} else {
-				let article = {
-					content: detail_content,
-					category_id: res.options.catid,
-					name: name,
-					des: name,
-					create_time: new Date(),
-					icon: icon,
-					tag: 'qr'+id,
-				};
-				// console.log(article);
-
-				dbUtil.insertArticle(article, (finish) => {
-					if (finish !== false) console.log("文章插入成功")
-				})
-			}
+			let imagep = $('dl dt img').attr('src');
+			imagep = host+imagep;
+			
+			let playDetail = host + $('.film_bar a').attr('href');
+			let playtitle = $('.film_title').text();
+			
+			cvideo.queue({
+				uri: playDetail,
+				videoImageUrl: imagep,
+				videoTitle: playtitle,
+				catid: res.options.catid,
+			});
 		}
 		done();
+	}
+});
+
+var cvideo = new Crawler({
+	skipDuplicates: true,
+	maxConnections: 5,
+	callback: function (error, res, done) {
+		if (error) {
+			console.log(error);
+		} else {
+			try {
+				let $ = res.$;
+				
+				ImgDoenload(res.options.videoImageUrl, (filename)=>{
+					let html = $.html();
+					let videourl = html.match(/video:'(\S[^']*)'/)[1];
+					let tag = 'qrv' + res.options.uri.match(/\/(\d*).html/)[1];
+
+					let video = {
+						url: videourl,
+						mcategory_id: res.options.catid,
+						icon: filename,
+						name: res.options.videoTitle,
+						createtime: new Date(),
+						tag: tag,
+					};
+					// console.log(video);
+
+					dbUtil.insertVideo(video, (finish) => {
+						if (finish) console.log("插入成功")
+					});
+
+				});
+				
+				
+				
+			}catch (e){
+			}
+			
+		}
+		done();
+		
 	}
 });
 
@@ -147,7 +177,7 @@ startFF();
 
 //每秒检测一次，队列是否为空
 setInterval(function () {
-	if (cFirst.queueSize === 0 && cList.queueSize === 0 && cDetail.queueSize === 0) {
+	if (cFirst.queueSize === 0 && cList.queueSize === 0 && cDetail.queueSize === 0 && cvideo.queueSize === 0) {
 		console.log('爬取已结束');
 		// console.log(hasReadSet);
 		process.exit();

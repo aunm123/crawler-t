@@ -11,7 +11,7 @@ function startFF() {
 	
 	for (let i = 16; i<=17; i++){
 		let temp = startUrl.replace(/-id-(\d*)/,"-id-"+i);
-		// console.log(temp);
+		// console.log(temp);2
 		cFirst.queue({
 			uri: temp,
 			timeout: 150000,

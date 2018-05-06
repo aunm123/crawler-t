@@ -130,15 +130,15 @@ exports.insertCategory = function (category, callback = defaultCallback) {
 	})
 };
 
-exports.findVideoById = function (vid, callback = defaultCallback) {
+exports.findVideoByTag = function (tag, callback = defaultCallback) {
 
-	if (vid === null) {
-		callback(false);
+	if (tag === null) {
+		callback({});
 		return;
 	}
 
-	let addSql = 'select * from `t_video` where `id` = ?';
-	let addParams = [vid];
+	let addSql = 'select * from `t_video` where `tag` = ?';
+	let addParams = [tag];
 	let sql = mysql.format(addSql, addParams);
 
 	query(sql, function (err, rows, fields) {
@@ -147,7 +147,7 @@ exports.findVideoById = function (vid, callback = defaultCallback) {
 		}
 		else {
 			if (rows.length > 0) {
-				callback(rows[0]);
+				callback(true);
 			}
 			else {
 				callback(false);
@@ -164,12 +164,12 @@ exports.insertVideo = function (video, callback = defaultCallback) {
 		return;
 	}
 
-	let addSql = 'insert into `t_video` ( `id`, `url`, `mcategory_id`, `icon`, `name`, `createtime`) values' +
+	let addSql = 'insert into `t_video` ( `url`, `mcategory_id`, `icon`, `name`, `createtime`, `tag`) values' +
 		' ( ?, ?, ?, ?, ?, ?);';
-	let addParams = [video.id, video.url, video.mcategory_id, video.icon, video.name, video.createtime];
+	let addParams = [video.url, video.mcategory_id, video.icon, video.name, video.createtime, video.tag];
 	let sql = mysql.format(addSql, addParams);
 
-	this.findVideoById(video.id, (result) => {
+	this.findVideoByTag(video.id, (result) => {
 		if (result === false) {
 			query(sql, function (err, result, fields) {
 				if (err) {
@@ -177,12 +177,10 @@ exports.insertVideo = function (video, callback = defaultCallback) {
 					console.log(err);
 				}
 				else {
-					console.log('INSERT ID:', result);
+					console.log('插入视频成功');
 					callback(true);
 				}
 			});
-		} else {
-			console.log("已经存在");
 		}
 	})
 };

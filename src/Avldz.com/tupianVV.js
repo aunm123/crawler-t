@@ -1,5 +1,6 @@
 var Crawler = require("crawler");
 const dbUtil = require('../db/dbUtil');
+const ImgDoenload = require('../util/ImgDoenload');
 
 dbUtil.init();
 
@@ -104,8 +105,10 @@ var cList = new Crawler({
 
 				// http://avldz.com/vod-detail-id-95817.html
 				let id = url.match(/-id-(\d*)./)[1];
+				
+				let tag = 'qavldz'+id;
 
-				dbUtil.findVideoById(id,(finish)=>{
+				dbUtil.findVideoByTag(tag,(finish)=>{
 					if (finish === false){
 						if (not(url)){
 							cDetail.queue({
@@ -173,21 +176,29 @@ var cvideo = new Crawler({
 
 				let video_cid = $('body > div:nth-child(9) > div:nth-child(1) > span > a:nth-child(2)').attr('href');
 				video_cid = video_cid.match(/vod-type-id-(\d*)-/)[1];
+				
+				let tag = 'qavldz'+video_cid;
 
-				let video = {
-					id: parseInt(videoid),
-					url: videourl,
-					mcategory_id: parseInt(video_cid),
-					icon: res.options.videoImageUrl,
-					name: videoTitle,
-					createtime: new Date(),
-				};
-
-				// console.log(video);
-
-				dbUtil.insertVideo(video, (finish) => {
-					if (finish) console.log("插入成功")
+				
+				
+				ImgDoenload(res.options.videoImageUrl, (filename)=>{
+					
+					let video = {
+						tag: tag,
+						url: videourl,
+						mcategory_id: parseInt(video_cid),
+						icon: filename,
+						name: videoTitle,
+						createtime: new Date(),
+					};
+					// console.log(video);
+					
+					dbUtil.insertVideo(video, (finish) => {
+						if (finish) console.log("插入成功")
+					});
+					
 				});
+				
 			}catch (e){
 				dbUtil.insertCache(res.options.uri, '[]', function () {
 					console.log(res.options.uri , "抓取失败");
