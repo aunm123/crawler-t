@@ -1,4 +1,6 @@
 const {randName32} = require("./Rand");
+const path = require('path');
+var md5 = require('md5');
 const fs = require('fs'),
 	request = require('request');
 
@@ -24,29 +26,48 @@ Date.prototype.format = function (fmt) {
 }
 
 var download = function (uri, callback) {
-	request.head(uri, function (err, res, body) {
-		// console.log('content-type:', res.headers['content-type']);
-		// console.log('content-length:', res.headers['content-length']);
-		
-		let curTime = new Date().format("yyyy_MM_dd");
-		let index1=uri.lastIndexOf(".");
-		let index2=uri.length;
-		let suffix=uri.substring(index1+1,index2);//后缀名
-		
-		
-		let dirpath = "../../images/" + curTime + "/";
-		if (!fs.existsSync(dirpath)){
-			fs.mkdirSync(dirpath);
-		}
-		
-		let filename = dirpath + randName32() + "." +suffix;
-		
-		let realBack = () =>{
-			callback("/images/" + curTime + "/" + randName32() + "." +suffix);
-		};
-		
-		request(uri).pipe(fs.createWriteStream(filename)).on('close', realBack);
-	});
+	try{
+		request.head(uri, function (err, res, body) {
+			// console.log('content-type:', res.headers['content-type']);
+			// console.log('content-length:', res.headers['content-length']);
+
+			let curTime = new Date().format("yyyy_MM_dd");
+			let index1=uri.lastIndexOf(".");
+			let index2=uri.length;
+			let suffix=uri.substring(index1+1,index2);//后缀名
+
+			let dir_realy = path.join(__dirname, '../../locati/');
+			let dirpath = dir_realy + curTime + "/";
+			if (!fs.existsSync(dirpath)){
+				fs.mkdirSync(dirpath);
+			}
+
+			let rr = md5(uri);
+			let filename = dirpath + rr + "." +suffix;
+
+			let realBack = () =>{
+				callback("/locati/" + curTime + "/" + rr + "." +suffix);
+			};
+
+			request({uri: uri, encoding: 'binary'}, function (error, response, body) {
+				if (!error && response.statusCode === 200) {
+					fs.writeFile(filename, body, 'binary', function (err) {
+						if (err) {console.log(err);}
+					});
+					realBack()
+				}
+			});
+
+			// request(uri).pipe(fs.createWriteStream(filename)).on('close', realBack);
+
+		});
+	}catch(e){
+		console.log(e)
+	}
 };
 
 module.exports = download;
+
+// download('http://images.haiwainet.cn/2018/0228/20180228104423156.jpg',(filename)=>{
+// 	console.log(filename)
+// })

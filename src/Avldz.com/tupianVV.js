@@ -135,7 +135,11 @@ var cDetail = new Crawler({
 			console.log(error);
 		} else {
 			let $ = res.$;
+
 			let imagep = $('.movie_info dl dt img').attr('src');
+			if (!(/^http/.test(imagep))){
+				imagep = host + imagep;
+			}
 
 			let playDetail = host + $('.play-list a:nth-child(1)').attr('href');
 
@@ -177,7 +181,7 @@ var cvideo = new Crawler({
 				let video_cid = $('body > div:nth-child(9) > div:nth-child(1) > span > a:nth-child(2)').attr('href');
 				video_cid = video_cid.match(/vod-type-id-(\d*)-/)[1];
 				
-				let tag = 'qavldz'+video_cid;
+				let tag = 'qavldz'+videoid;
 
 				
 				
