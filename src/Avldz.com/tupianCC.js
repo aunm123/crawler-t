@@ -8,8 +8,8 @@ let host = startUrl.match(/(https?:\/\/\S[^/]*)/)[1];
 let currentCategoryid = 0;
 
 function startFF() {
-	
-	for (let i = 16; i<=17; i++){
+
+	for (let i = 8; i<=15; i++){
 		let temp = startUrl.replace(/-id-(\d*)/,"-id-"+i);
 		// console.log(temp);2
 		cFirst.queue({
@@ -112,13 +112,13 @@ var cDetail = new Crawler({
 
 			}else {
 				let article = {
-					id: id,
 					content: detail_content,
 					category_id: currentCategoryid,
 					name: name,
 					des: name,
 					create_time: new Date(),
 					icon: icon,
+					tag: 'qr'+id,
 				};
 
 				dbUtil.insertArticle(article, (finish) => {
