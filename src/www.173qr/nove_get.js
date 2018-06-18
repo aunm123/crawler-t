@@ -3,29 +3,30 @@ const dbUtil = require('../db/dbUtil');
 
 dbUtil.init();
 
-let startUrl = 'http://www.173qr.com/html/photo/1/1.html';
+let startUrl = 'http://173qr.com/html/novel/1/1.html';
 let host = startUrl.match(/(https?:\/\/\S[^/]*)/)[1];
 
-let arcate={
-	1:9,
-	2:10,
-	3:13,
-	4:8,
-	5:14,
-	6:15,
-	7:11,
-	8:12,
+let nocate={
+	1:19,
+	2:23,
+	3:25,
+	4:20,
+	5:22,
+	6:21,
+	7:26,
+	8:24,
 };
 
 function startFF() {
 
 	for (let i = 1; i <= 8; i++) {
-		let temp = startUrl.replace(/photo\/(\d*)/, "photo/" + i);
+		let temp = startUrl.replace(/novel\/(\d*)/, "novel/" + i);
 		// console.log(temp);
+
 		cFirst.queue({
 			uri: temp,
 			timeout: 150000,
-			catid: arcate[i],
+			catid: nocate[i],
 		})
 	}
 
@@ -53,8 +54,8 @@ var cFirst = new Crawler({
 				// 	name: name,
 				// 	des: name,
 				// }
-				// // console.log(category);
-				//
+				// console.log(category);
+
 				// dbUtil.insertCategory(category);
 
 				let maxPage = $('.pagination a');
@@ -95,7 +96,7 @@ var cList = new Crawler({
 			targetUl.each(function (index, item) {
 				let url = host + item.attribs.href;
 
-				let tag = 'qrp' + url.match(/\/(\d*).html/)[1];
+				let tag = 'qr' + url.match(/\/(\d*).html/)[1];
 				// console.log(url);
 
 
@@ -127,7 +128,7 @@ var cDetail = new Crawler({
 			let $ = res.$;
 			let detail_content = $('.txt .tcont').html();
 			let name = $('.txt .thead').text();
-			let icon = $($('.txt .tcont img')[2]).attr('src');
+			let icon = $('.txt .tcont img:nth-child(2)').attr('src');
 			let id = res.options.uri.match(/\/(\d*).html/)[1];
 
 			let pn = $('.txt .tcont .pn').html();
@@ -144,7 +145,7 @@ var cDetail = new Crawler({
 					des: name,
 					create_time: new Date(),
 					icon: icon,
-					tag: 'qrp'+id,
+					tag: 'qr'+id,
 				};
 				// console.log(article);
 

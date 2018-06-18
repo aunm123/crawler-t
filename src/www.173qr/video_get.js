@@ -7,6 +7,17 @@ dbUtil.init();
 let startUrl = 'http://www.173qr.com/html/video/1/1.html';
 let host = startUrl.match(/(https?:\/\/\S[^/]*)/)[1];
 
+let vicate={
+	1:56,
+	2:61,
+	3:58,
+	4:57,
+	5:63,
+	6:56,
+	7:56,
+	8:65,
+};
+
 function startFF() {
 
 	for (let i = 1; i <= 8; i++) {
@@ -15,7 +26,7 @@ function startFF() {
 		cFirst.queue({
 			uri: temp,
 			timeout: 150000,
-			catid: i,
+			catid: vicate[i],
 		})
 	}
 
@@ -36,13 +47,13 @@ var cFirst = new Crawler({
 
 
 				let id = res.options.catid;
-				let name = $('.nle h3').text();
-
-				let category = {
-					id: id,
-					name: name,
-					des: name,
-				}
+				// let name = $('.nle h3').text();
+				//
+				// let category = {
+				// 	id: id,
+				// 	name: name,
+				// 	des: name,
+				// }
 				// console.log(category);
 
 				dbUtil.insertCategory(category);

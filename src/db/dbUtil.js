@@ -157,6 +157,34 @@ exports.findVideoByTag = function (tag, callback = defaultCallback) {
 	});
 };
 
+
+exports.findVideoByUrl = function (videourl, callback = defaultCallback) {
+
+	if (videourl === null) {
+		callback({});
+		return;
+	}
+
+	let addSql = 'select * from `t_video` where `url` = ?';
+	let addParams = [videourl];
+	let sql = mysql.format(addSql, addParams);
+
+	query(sql, function (err, rows, fields) {
+		if (err) {
+			callback({});
+		}
+		else {
+			if (rows.length > 0) {
+				callback(true);
+			}
+			else {
+				callback(false);
+			}
+
+		}
+	});
+};
+
 exports.insertVideo = function (video, callback = defaultCallback) {
 
 	if (video === null) {
